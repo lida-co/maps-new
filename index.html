@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Create and style clusters</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.0.1/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.0.1/mapbox-gl.css" rel="stylesheet" />
+<style>
+	body { margin: 0; padding: 0; }
+	#map { position: absolute; top: 0; bottom: 0; width: 100%; }
+</style>
+</head>
+<body>
+<div id="map"></div>
+ 
+<script>
+	mapboxgl.accessToken = 'pk.eyJ1IjoiZmlrcm11aGFtbWFkIiwiYSI6ImNrZHIxN25iMTA0MDUyeW54YnNqNHg1ZmoifQ.E-1wxL0bJz5YPTU7TUw8gQ';
+var map = new mapboxgl.Map({
+	container: 'map', // container id
+	style: 'mapbox://styles/fikrmuhammad/ckerx9e747kdp1as5v60ja1o1',
+	center: [113, -0.7],
+	zoom: 4.6 // starting zoom
+});
+
+map.addControl(new mapboxgl.NavigationControl());
+
+//===========================================================================================================================================
+//layer maluku
+map.on('load', function () {
+	map.addSource('maluku', {
+		type: 'geojson',
+		data: 'Maluku.geojson',
+		cluster: true,
+		clusterMaxZoom: 14, // Max zoom to cluster points on
+		clusterRadius: 50 // Radius of each cluster when clustering points (defaults to 50)
+	});
+	 
+	map.addLayer({
+		id: 'clusters-maluku',
+		type: 'circle',
+		source: 'maluku',
+		filter: ['has', 'point_count'],
+		paint: {
+			'circle-color': [
+				'step',
+				['get', 'point_count'],
+				'#51bbd6',100,
+				'#f1f075',750,
+				'#f28cb1'
+			],
+			'circle-radius': [
+				'step',
+				['get', 'point_count'],
+				20,100,30,750,40
+			]
+		}
+	});
+	 
+	map.addLayer({
+		id: 'cluster-count-maluku',
+		type: 'symbol',
+		source: 'maluku',
+		filter: ['has', 'point_count'],
+		layout: {
+			'text-field': '{point_count_abbreviated}',
+			'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+			'text-size': 12
+		}
+	});
+	 
+	map.addLayer({
+		id: 'unclustered-point-maluku',
+		type: 'circle',
+		source: 'maluku',
+		filter: ['!', ['has', 'point_count']],
+		paint: {
+				'circle-color': '#11b4da',
+				'circle-radius': 4,
+				'circle-stroke-width': 1,
+				'circle-stroke-color': '#fff'
+		}
+	});
+	 
+	// inspect a cluster on click
+	map.on('click', 'clusters-maluku', function (e) {
+		var features = map.queryRenderedFeatures(e.point, {
+				layers: ['clusters-maluku']
+		});
+		var clusterId = features[0].properties.cluster_id;
+			map.getSource('maluku').getClusterExpansionZoom(
+			clusterId,
+			function (err, zoom) {
+				if (err) return;
+				 
+				map.easeTo({
+						center: features[0].geometry.coordinates,
+						zoom: zoom
+				});
+			}
+		);
+	});
+
+	map.on('click', 'unclustered-point-maluku', function (e) {
+		var coordinates = e.features[0].geometry.coordinates.slice();
+		var TID = e.features[0].properties.TID;
+		var MID = e.features[0].properties.MID;
+		var KANWIL = e.features[0].properties.KANWIL;
+		var CABANG = e.features[0].properties.CABANG;
+		var UKER = e.features[0].properties.UKER;
+		var ALAMAT_TID = e.features[0].properties.ALAMAT_TID;
+		var NAMA_KEL = e.features[0].properties.NAMA_KEL;
+		var LATITUDE = e.features[0].properties.LATITUDE;
+		var LONGITUDE = e.features[0].properties.LONGITUDE
+				 
+		new mapboxgl.Popup()
+			.setLngLat(coordinates)
+			.setHTML(
+			'<b>' + 'TID: ' + '</b>' + TID + '</br>' + '<b>' + 'MID: ' + '</b>' + MID + '</br>' + '<b>' + 'KANWIL: ' + '</b>' + KANWIL + '</br>' + '<b>' + 'CABANG: ' + '</b>' + CABANG + '</br>' + '<b>' + 'UKER: ' + '</b>' + UKER + '</br>' + '<b>' + 'ALAMAT: ' + '</b>' + ALAMAT_TID + '</br>' + '<b>' + 'NAMA KELURAHAN: ' + '</b>' + NAMA_KEL + '</br>' + '<b>' + 'LATITUDE: ' + '</b>' + LATITUDE + '</br>' + '<b>' + 'LONGITUDE: ' + '</b>' + LONGITUDE + '</br>' 
+		)
+		.addTo(map);
+	});
+
+
+	map.on('mouseenter', 'clusters-maluku', function () {
+		map.getCanvas().style.cursor = 'pointer';
+	});
+
+	map.on('mouseleave', 'clusters-maluku', function () {
+		map.getCanvas().style.cursor = '';
+	});
+});
+
+
+//===========================================================================================================================================
+//layer DENPASAR	
+map.on('load', function () {
+	map.addSource('denpasar', {
+		type: 'geojson',
+		data: 'Denpasar.geojson',
+		cluster: true,
+		clusterMaxZoom: 14, // Max zoom to cluster points on
+		clusterRadius: 50 // Radius of each cluster when clustering points (defaults to 50)
+	});
+	 
+	map.addLayer({
+		id: 'clusters-denpasar',
+		type: 'circle',
+		source: 'denpasar',
+		filter: ['has', 'point_count'],
+		paint: {
+			'circle-color': [
+				'step',
+				['get', 'point_count'],
+				'#51bbd6',100,
+				'#f1f075',750,
+				'#f28cb1'
+			],
+			'circle-radius': [
+				'step',
+				['get', 'point_count'],
+				20,100,30,750,40
+			]
+		}
+	});
+	 
+	map.addLayer({
+		id: 'cluster-count-denpasar',
+		type: 'symbol',
+		source: 'denpasar',
+		filter: ['has', 'point_count'],
+		layout: {
+			'text-field': '{point_count_abbreviated}',
+			'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+			'text-size': 12
+		}
+	});
+	 
+	map.addLayer({
+		id: 'unclustered-point-denpasar',
+		type: 'circle',
+		source: 'denpasar',
+		filter: ['!', ['has', 'point_count']],
+		paint: {
+				'circle-color': '#11b4da',
+				'circle-radius': 4,
+				'circle-stroke-width': 1,
+				'circle-stroke-color': '#fff'
+		}
+	});
+	 
+	// inspect a cluster on click
+	map.on('click', 'clusters-denpasar', function (e) {
+		var features = map.queryRenderedFeatures(e.point, {
+				layers: ['clusters-denpasar']
+		});
+		var clusterId = features[0].properties.cluster_id;
+			map.getSource('denpasar').getClusterExpansionZoom(
+			clusterId,
+			function (err, zoom) {
+				if (err) return;
+				 
+				map.easeTo({
+						center: features[0].geometry.coordinates,
+						zoom: zoom
+				});
+			}
+		);
+	});
+
+	map.on('click', 'unclustered-point-denpasar', function (e) {
+		var coordinates = e.features[0].geometry.coordinates.slice();
+		var TID = e.features[0].properties.TID;
+		var MID = e.features[0].properties.MID;
+		var KANWIL = e.features[0].properties.KANWIL;
+		var CABANG = e.features[0].properties.CABANG;
+		var UKER = e.features[0].properties.UKER;
+		var ALAMAT_TID = e.features[0].properties.ALAMAT_TID;
+		var NAMA_KEL = e.features[0].properties.NAMA_KEL;
+		var LATITUDE = e.features[0].properties.LATITUDE;
+		var LONGITUDE = e.features[0].properties.LONGITUDE
+				 
+		new mapboxgl.Popup()
+			.setLngLat(coordinates)
+			.setHTML(
+			'<b>' + 'TID: ' + '</b>' + TID + '</br>' + '<b>' + 'MID: ' + '</b>' + MID + '</br>' + '<b>' + 'KANWIL: ' + '</b>' + KANWIL + '</br>' + '<b>' + 'CABANG: ' + '</b>' + CABANG + '</br>' + '<b>' + 'UKER: ' + '</b>' + UKER + '</br>' + '<b>' + 'ALAMAT: ' + '</b>' + ALAMAT_TID + '</br>' + '<b>' + 'NAMA KELURAHAN: ' + '</b>' + NAMA_KEL + '</br>' + '<b>' + 'LATITUDE: ' + '</b>' + LATITUDE + '</br>' + '<b>' + 'LONGITUDE: ' + '</b>' + LONGITUDE + '</br>' 
+		)
+		.addTo(map);
+	});
+
+
+	map.on('mouseenter', 'clusters-denpasar', function () {
+		map.getCanvas().style.cursor = 'pointer';
+	});
+
+	map.on('mouseleave', 'clusters-denpasar', function () {
+		map.getCanvas().style.cursor = '';
+	});
+});
+
+
+//===========================================================================================================================================
+//layer JAWA
+map.on('load', function () {
+	map.addSource('jawa', {
+		type: 'geojson',
+		data: 'Jawa.geojson',
+		cluster: true,
+		clusterMaxZoom: 14, // Max zoom to cluster points on
+		clusterRadius: 50 // Radius of each cluster when clustering points (defaults to 50)
+	});
+	 
+	map.addLayer({
+		id: 'clusters-jawa',
+		type: 'circle',
+		source: 'jawa',
+		filter: ['has', 'point_count'],
+		paint: {
+			'circle-color': [
+				'step',
+				['get', 'point_count'],
+				'#51bbd6',100,
+				'#f1f075',750,
+				'#f28cb1'
+			],
+			'circle-radius': [
+				'step',
+				['get', 'point_count'],
+				20,100,30,750,40
+			]
+		}
+	});
+	 
+	map.addLayer({
+		id: 'cluster-count-jawa',
+		type: 'symbol',
+		source: 'jawa',
+		filter: ['has', 'point_count'],
+		layout: {
+			'text-field': '{point_count_abbreviated}',
+			'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+			'text-size': 12
+		}
+	});
+	 
+	map.addLayer({
+		id: 'unclustered-point-jawa',
+		type: 'circle',
+		source: 'jawa',
+		filter: ['!', ['has', 'point_count']],
+		paint: {
+				'circle-color': '#11b4da',
+				'circle-radius': 4,
+				'circle-stroke-width': 1,
+				'circle-stroke-color': '#fff'
+		}
+	});
+	 
+	// inspect a cluster on click
+	map.on('click', 'clusters-jawa', function (e) {
+		var features = map.queryRenderedFeatures(e.point, {
+				layers: ['clusters-jawa']
+		});
+		var clusterId = features[0].properties.cluster_id;
+			map.getSource('jawa').getClusterExpansionZoom(
+			clusterId,
+			function (err, zoom) {
+				if (err) return;
+				 
+				map.easeTo({
+						center: features[0].geometry.coordinates,
+						zoom: zoom
+				});
+			}
+		);
+	});
+
+	map.on('click', 'unclustered-point-jawa', function (e) {
+		var coordinates = e.features[0].geometry.coordinates.slice();
+		var TID = e.features[0].properties.TID;
+		var MID = e.features[0].properties.MID;
+		var KANWIL = e.features[0].properties.KANWIL;
+		var CABANG = e.features[0].properties.CABANG;
+		var UKER = e.features[0].properties.UKER;
+		var ALAMAT_TID = e.features[0].properties.ALAMAT_TID;
+		var NAMA_KEL = e.features[0].properties.NAMA_KEL;
+		var LATITUDE = e.features[0].properties.LATITUDE;
+		var LONGITUDE = e.features[0].properties.LONGITUDE
+				 
+		new mapboxgl.Popup()
+			.setLngLat(coordinates)
+			.setHTML(
+			'<b>' + 'TID: ' + '</b>' + TID + '</br>' + '<b>' + 'MID: ' + '</b>' + MID + '</br>' + '<b>' + 'KANWIL: ' + '</b>' + KANWIL + '</br>' + '<b>' + 'CABANG: ' + '</b>' + CABANG + '</br>' + '<b>' + 'UKER: ' + '</b>' + UKER + '</br>' + '<b>' + 'ALAMAT: ' + '</b>' + ALAMAT_TID + '</br>' + '<b>' + 'NAMA KELURAHAN: ' + '</b>' + NAMA_KEL + '</br>' + '<b>' + 'LATITUDE: ' + '</b>' + LATITUDE + '</br>' + '<b>' + 'LONGITUDE: ' + '</b>' + LONGITUDE + '</br>' 
+		)
+		.addTo(map);
+	});
+
+
+	map.on('mouseenter', 'clusters-jawa', function () {
+		map.getCanvas().style.cursor = 'pointer';
+	});
+
+	map.on('mouseleave', 'clusters-jawa', function () {
+		map.getCanvas().style.cursor = '';
+	});
+});
+
+
+//===========================================================================================================================================
+//layer JAKARTA
+map.on('load', function () {
+	map.addSource('jakarta', {
+		type: 'geojson',
+		data: 'Jakarta.geojson',
+		cluster: true,
+		clusterMaxZoom: 14, // Max zoom to cluster points on
+		clusterRadius: 50 // Radius of each cluster when clustering points (defaults to 50)
+	});
+	 
+	map.addLayer({
+		id: 'clusters-jakarta',
+		type: 'circle',
+		source: 'jakarta',
+		filter: ['has', 'point_count'],
+		paint: {
+			'circle-color': [
+				'step',
+				['get', 'point_count'],
+				'#51bbd6',100,
+				'#f1f075',750,
+				'#f28cb1'
+			],
+			'circle-radius': [
+				'step',
+				['get', 'point_count'],
+				20,100,30,750,40
+			]
+		}
+	});
+	 
+	map.addLayer({
+		id: 'cluster-count-jakarta',
+		type: 'symbol',
+		source: 'jakarta',
+		filter: ['has', 'point_count'],
+		layout: {
+			'text-field': '{point_count_abbreviated}',
+			'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+			'text-size': 12
+		}
+	});
+	 
+	map.addLayer({
+		id: 'unclustered-point-jakarta',
+		type: 'circle',
+		source: 'jakarta',
+		filter: ['!', ['has', 'point_count']],
+		paint: {
+				'circle-color': '#11b4da',
+				'circle-radius': 4,
+				'circle-stroke-width': 1,
+				'circle-stroke-color': '#fff'
+		}
+	});
+	 
+	// inspect a cluster on click
+	map.on('click', 'clusters-jakarta', function (e) {
+		var features = map.queryRenderedFeatures(e.point, {
+				layers: ['clusters-jakarta']
+		});
+		var clusterId = features[0].properties.cluster_id;
+			map.getSource('jakarta').getClusterExpansionZoom(
+			clusterId,
+			function (err, zoom) {
+				if (err) return;
+				 
+				map.easeTo({
+						center: features[0].geometry.coordinates,
+						zoom: zoom
+				});
+			}
+		);
+	});
+
+	map.on('click', 'unclustered-point-jakarta', function (e) {
+		var coordinates = e.features[0].geometry.coordinates.slice();
+		var TID = e.features[0].properties.TID;
+		var MID = e.features[0].properties.MID;
+		var KANWIL = e.features[0].properties.KANWIL;
+		var CABANG = e.features[0].properties.CABANG;
+		var UKER = e.features[0].properties.UKER;
+		var ALAMAT_TID = e.features[0].properties.ALAMAT_TID;
+		var NAMA_KEL = e.features[0].properties.NAMA_KEL;
+		var LATITUDE = e.features[0].properties.LATITUDE;
+		var LONGITUDE = e.features[0].properties.LONGITUDE
+				 
+		new mapboxgl.Popup()
+			.setLngLat(coordinates)
+			.setHTML(
+			'<b>' + 'TID: ' + '</b>' + TID + '</br>' + '<b>' + 'MID: ' + '</b>' + MID + '</br>' + '<b>' + 'KANWIL: ' + '</b>' + KANWIL + '</br>' + '<b>' + 'CABANG: ' + '</b>' + CABANG + '</br>' + '<b>' + 'UKER: ' + '</b>' + UKER + '</br>' + '<b>' + 'ALAMAT: ' + '</b>' + ALAMAT_TID + '</br>' + '<b>' + 'NAMA KELURAHAN: ' + '</b>' + NAMA_KEL + '</br>' + '<b>' + 'LATITUDE: ' + '</b>' + LATITUDE + '</br>' + '<b>' + 'LONGITUDE: ' + '</b>' + LONGITUDE + '</br>' 
+		)
+		.addTo(map);
+	});
+
+
+	map.on('mouseenter', 'clusters-jakarta', function () {
+		map.getCanvas().style.cursor = 'pointer';
+	});
+
+	map.on('mouseleave', 'clusters-jakarta', function () {
+		map.getCanvas().style.cursor = '';
+	});
+});
+
+
+
+//========================================================================================================================================
+//layer KALIMANTAN
+map.on('load', function () {
+	map.addSource('kalimantan', {
+		type: 'geojson',
+		data: 'Kalimantan.geojson',
+		cluster: true,
+		clusterMaxZoom: 14, // Max zoom to cluster points on
+		clusterRadius: 50 // Radius of each cluster when clustering points (defaults to 50)
+	});
+	 
+	map.addLayer({
+		id: 'clusters-kalimantan',
+		type: 'circle',
+		source: 'kalimantan',
+		filter: ['has', 'point_count'],
+		paint: {
+			'circle-color': [
+				'step',
+				['get', 'point_count'],
+				'#51bbd6',100,
+				'#f1f075',750,
+				'#f28cb1'
+			],
+			'circle-radius': [
+				'step',
+				['get', 'point_count'],
+				20,100,30,750,40
+			]
+		}
+	});
+	 
+	map.addLayer({
+		id: 'cluster-count-maluku',
+		type: 'symbol',
+		source: 'maluku',
+		filter: ['has', 'point_count'],
+		layout: {
+			'text-field': '{point_count_abbreviated}',
+			'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+			'text-size': 12
+		}
+	});
+	 
+	map.addLayer({
+		id: 'unclustered-point-kalimantan',
+		type: 'circle',
+		source: 'kalimantan',
+		filter: ['!', ['has', 'point_count']],
+		paint: {
+				'circle-color': '#11b4da',
+				'circle-radius': 4,
+				'circle-stroke-width': 1,
+				'circle-stroke-color': '#fff'
+		}
+	});
+	 
+	// inspect a cluster on click
+	map.on('click', 'clusters-kalimantan', function (e) {
+		var features = map.queryRenderedFeatures(e.point, {
+				layers: ['clusters-kalimantan']
+		});
+		var clusterId = features[0].properties.cluster_id;
+			map.getSource('kalimantan').getClusterExpansionZoom(
+			clusterId,
+			function (err, zoom) {
+				if (err) return;
+				 
+				map.easeTo({
+						center: features[0].geometry.coordinates,
+						zoom: zoom
+				});
+			}
+		);
+	});
+
+	map.on('click', 'unclustered-point-kalimantan', function (e) {
+		var coordinates = e.features[0].geometry.coordinates.slice();
+		var TID = e.features[0].properties.TID;
+		var MID = e.features[0].properties.MID;
+		var KANWIL = e.features[0].properties.KANWIL;
+		var CABANG = e.features[0].properties.CABANG;
+		var UKER = e.features[0].properties.UKER;
+		var ALAMAT_TID = e.features[0].properties.ALAMAT_TID;
+		var NAMA_KEL = e.features[0].properties.NAMA_KEL;
+		var LATITUDE = e.features[0].properties.LATITUDE;
+		var LONGITUDE = e.features[0].properties.LONGITUDE
+				 
+		new mapboxgl.Popup()
+			.setLngLat(coordinates)
+			.setHTML(
+			'<b>' + 'TID: ' + '</b>' + TID + '</br>' + '<b>' + 'MID: ' + '</b>' + MID + '</br>' + '<b>' + 'KANWIL: ' + '</b>' + KANWIL + '</br>' + '<b>' + 'CABANG: ' + '</b>' + CABANG + '</br>' + '<b>' + 'UKER: ' + '</b>' + UKER + '</br>' + '<b>' + 'ALAMAT: ' + '</b>' + ALAMAT_TID + '</br>' + '<b>' + 'NAMA KELURAHAN: ' + '</b>' + NAMA_KEL + '</br>' + '<b>' + 'LATITUDE: ' + '</b>' + LATITUDE + '</br>' + '<b>' + 'LONGITUDE: ' + '</b>' + LONGITUDE + '</br>' 
+		)
+		.addTo(map);
+	});
+
+
+	map.on('mouseenter', 'clusters-kalimantan', function () {
+		map.getCanvas().style.cursor = 'pointer';
+	});
+
+	map.on('mouseleave', 'clusters-kalimantan', function () {
+		map.getCanvas().style.cursor = '';
+	});
+});
+
+
+
+
+//========================================================================================================================================
+//layer SULAWESI
+map.on('load', function () {
+	map.addSource('sulawesi', {
+		type: 'geojson',
+		data: 'Sulawesi.geojson',
+		cluster: true,
+		clusterMaxZoom: 14, // Max zoom to cluster points on
+		clusterRadius: 50 // Radius of each cluster when clustering points (defaults to 50)
+	});
+	 
+	map.addLayer({
+		id: 'clusters-sulawesi',
+		type: 'circle',
+		source: 'sulawesi',
+		filter: ['has', 'point_count'],
+		paint: {
+			'circle-color': [
+				'step',
+				['get', 'point_count'],
+				'#51bbd6',100,
+				'#f1f075',750,
+				'#f28cb1'
+			],
+			'circle-radius': [
+				'step',
+				['get', 'point_count'],
+				20,100,30,750,40
+			]
+		}
+	});
+	 
+	map.addLayer({
+		id: 'cluster-count-sulawesi',
+		type: 'symbol',
+		source: 'sulawesi',
+		filter: ['has', 'point_count'],
+		layout: {
+			'text-field': '{point_count_abbreviated}',
+			'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+			'text-size': 12
+		}
+	});
+	 
+	map.addLayer({
+		id: 'unclustered-point-sulawesi',
+		type: 'circle',
+		source: 'sulawesi',
+		filter: ['!', ['has', 'point_count']],
+		paint: {
+				'circle-color': '#11b4da',
+				'circle-radius': 4,
+				'circle-stroke-width': 1,
+				'circle-stroke-color': '#fff'
+		}
+	});
+	 
+	// inspect a cluster on click
+	map.on('click', 'clusters-sulawesi', function (e) {
+		var features = map.queryRenderedFeatures(e.point, {
+				layers: ['clusters-sulawesi']
+		});
+		var clusterId = features[0].properties.cluster_id;
+			map.getSource('sulawesi').getClusterExpansionZoom(
+			clusterId,
+			function (err, zoom) {
+				if (err) return;
+				 
+				map.easeTo({
+						center: features[0].geometry.coordinates,
+						zoom: zoom
+				});
+			}
+		);
+	});
+
+	map.on('click', 'unclustered-point-sulawesi', function (e) {
+		var coordinates = e.features[0].geometry.coordinates.slice();
+		var TID = e.features[0].properties.TID;
+		var MID = e.features[0].properties.MID;
+		var KANWIL = e.features[0].properties.KANWIL;
+		var CABANG = e.features[0].properties.CABANG;
+		var UKER = e.features[0].properties.UKER;
+		var ALAMAT_TID = e.features[0].properties.ALAMAT_TID;
+		var NAMA_KEL = e.features[0].properties.NAMA_KEL;
+		var LATITUDE = e.features[0].properties.LATITUDE;
+		var LONGITUDE = e.features[0].properties.LONGITUDE
+				 
+		new mapboxgl.Popup()
+			.setLngLat(coordinates)
+			.setHTML(
+			'<b>' + 'TID: ' + '</b>' + TID + '</br>' + '<b>' + 'MID: ' + '</b>' + MID + '</br>' + '<b>' + 'KANWIL: ' + '</b>' + KANWIL + '</br>' + '<b>' + 'CABANG: ' + '</b>' + CABANG + '</br>' + '<b>' + 'UKER: ' + '</b>' + UKER + '</br>' + '<b>' + 'ALAMAT: ' + '</b>' + ALAMAT_TID + '</br>' + '<b>' + 'NAMA KELURAHAN: ' + '</b>' + NAMA_KEL + '</br>' + '<b>' + 'LATITUDE: ' + '</b>' + LATITUDE + '</br>' + '<b>' + 'LONGITUDE: ' + '</b>' + LONGITUDE + '</br>' 
+		)
+		.addTo(map);
+	});
+
+
+	map.on('mouseenter', 'clusters-sulawesi', function () {
+		map.getCanvas().style.cursor = 'pointer';
+	});
+
+	map.on('mouseleave', 'clusters-sulawesi', function () {
+		map.getCanvas().style.cursor = '';
+	});
+});
+
+
+
+
+
+//========================================================================================================================================
+//layer MEDAN
+map.on('load', function () {
+	map.addSource('sumatera', {
+		type: 'geojson',
+		data: 'Sumatera.geojson',
+		cluster: true,
+		clusterMaxZoom: 14, // Max zoom to cluster points on
+		clusterRadius: 50 // Radius of each cluster when clustering points (defaults to 50)
+	});
+	 
+	map.addLayer({
+		id: 'clusters-sumatera',
+		type: 'circle',
+		source: 'sumatera',
+		filter: ['has', 'point_count'],
+		paint: {
+			'circle-color': [
+				'step',
+				['get', 'point_count'],
+				'#51bbd6',100,
+				'#f1f075',750,
+				'#f28cb1'
+			],
+			'circle-radius': [
+				'step',
+				['get', 'point_count'],
+				20,100,30,750,40
+			]
+		}
+	});
+	 
+	map.addLayer({
+		id: 'cluster-count-sumatera',
+		type: 'symbol',
+		source: 'sumatera',
+		filter: ['has', 'point_count'],
+		layout: {
+			'text-field': '{point_count_abbreviated}',
+			'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+			'text-size': 12
+		}
+	});
+	 
+	map.addLayer({
+		id: 'unclustered-point-sumatera',
+		type: 'circle',
+		source: 'sumatera',
+		filter: ['!', ['has', 'point_count']],
+		paint: {
+				'circle-color': '#11b4da',
+				'circle-radius': 4,
+				'circle-stroke-width': 1,
+				'circle-stroke-color': '#fff'
+		}
+	});
+	 
+	// inspect a cluster on click
+	map.on('click', 'clusters-sumatera', function (e) {
+		var features = map.queryRenderedFeatures(e.point, {
+				layers: ['clusters-sumatera']
+		});
+		var clusterId = features[0].properties.cluster_id;
+			map.getSource('sumatera').getClusterExpansionZoom(
+			clusterId,
+			function (err, zoom) {
+				if (err) return;
+				 
+				map.easeTo({
+						center: features[0].geometry.coordinates,
+						zoom: zoom
+				});
+			}
+		);
+	});
+
+	map.on('click', 'unclustered-point-sumatera', function (e) {
+		var coordinates = e.features[0].geometry.coordinates.slice();
+		var TID = e.features[0].properties.TID;
+		var MID = e.features[0].properties.MID;
+		var KANWIL = e.features[0].properties.KANWIL;
+		var CABANG = e.features[0].properties.CABANG;
+		var UKER = e.features[0].properties.UKER;
+		var ALAMAT_TID = e.features[0].properties.ALAMAT_TID;
+		var NAMA_KEL = e.features[0].properties.NAMA_KEL;
+		var LATITUDE = e.features[0].properties.LATITUDE;
+		var LONGITUDE = e.features[0].properties.LONGITUDE
+				 
+		new mapboxgl.Popup()
+			.setLngLat(coordinates)
+			.setHTML(
+			'<b>' + 'TID: ' + '</b>' + TID + '</br>' + '<b>' + 'MID: ' + '</b>' + MID + '</br>' + '<b>' + 'KANWIL: ' + '</b>' + KANWIL + '</br>' + '<b>' + 'CABANG: ' + '</b>' + CABANG + '</br>' + '<b>' + 'UKER: ' + '</b>' + UKER + '</br>' + '<b>' + 'ALAMAT: ' + '</b>' + ALAMAT_TID + '</br>' + '<b>' + 'NAMA KELURAHAN: ' + '</b>' + NAMA_KEL + '</br>' + '<b>' + 'LATITUDE: ' + '</b>' + LATITUDE + '</br>' + '<b>' + 'LONGITUDE: ' + '</b>' + LONGITUDE + '</br>' 
+		)
+		.addTo(map);
+	});
+
+
+	map.on('mouseenter', 'clusters-sumatera', function () {
+		map.getCanvas().style.cursor = 'pointer';
+	});
+
+	map.on('mouseleave', 'clusters-sumatera', function () {
+		map.getCanvas().style.cursor = '';
+	});
+});
+</script>
+ 
+</body>
+</html>
